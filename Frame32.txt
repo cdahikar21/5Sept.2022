@@ -1,0 +1,72 @@
+package Base;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Properties;
+
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.sl.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.opera.OperaDriver;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+
+public class TestBase {
+	
+	public static WebDriver driver;
+	
+	public void initialization() throws Exception
+	{
+//		String browser = readpropertyFile("browserValue");
+		if(readpropertyFile("browser").equals("chrome"))
+		{
+		System.setProperty("webdriver.chrome.driver", "C:\\Users\\HP\\eclipse-workspace\\New project\\chromedriver.exe");
+		driver = new ChromeDriver();
+		}
+		else if(readpropertyFile("browser").equals("firefox"))
+		{ 
+			WebDriverManager.firefoxdriver().setup();
+			driver = new FirefoxDriver();
+		}
+		else if(readpropertyFile("browser").equals("opera"))
+		{ 
+			WebDriverManager.operadriver().setup();
+			driver = new OperaDriver();
+		}
+		
+		driver.manage().window().maximize();
+//       driver.get(readpropertyFile("url"));
+		driver.get(readExcelFile(0, 0));
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		}
+	
+	public String readExcelFile(int row,int col) throws Exception
+	{
+		FileInputStream file = new FileInputStream("C:\\Users\\HP\\eclipse-workspace\\frame2\\TestData\\fbook1.xlsx");
+		org.apache.poi.ss.usermodel.Sheet excelsheet = WorkbookFactory.create(file).getSheet("Sheet1");
+		String value = excelsheet.getRow(row).getCell(col).getStringCellValue();
+		return value;
+	}
+	
+
+	public String readpropertyFile(String value) throws Exception
+	{
+		Properties prop = new Properties();
+		FileInputStream file = new FileInputStream("C:\\Users\\HP\\eclipse-workspace\\frame2\\TestData\\config.properties");
+		prop.load(file);
+		return prop.getProperty(value);
+		
+	}
+	
+	
+	
+	
+	
+	
+
+}
